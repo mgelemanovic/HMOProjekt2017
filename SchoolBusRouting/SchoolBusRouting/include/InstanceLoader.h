@@ -12,6 +12,7 @@ namespace SBR
 
 		Position(float x, float y);
 
+		static float CalculateDistance2(const Position& first, const Position& second);
 		static float CalculateDistance(const Position& first, const Position& second);
 	};
 

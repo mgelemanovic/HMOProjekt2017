@@ -11,12 +11,17 @@ namespace SBR
 
 	}
 
-	float Position::CalculateDistance(const Position& first, const Position& second)
+	float Position::CalculateDistance2(const Position& first, const Position& second)
 	{
 		float dx = first.x - second.x;
 		float dy = first.y - second.y;
 
-		return sqrt(dx * dx + dy * dy);
+		return dx * dx + dy * dy;
+	}
+
+	float Position::CalculateDistance(const Position& first, const Position& second)
+	{
+		return sqrt(CalculateDistance2(first, second));
 	}
 
 	InstanceLoader::InstanceLoader(const std::string& strFilePath)
