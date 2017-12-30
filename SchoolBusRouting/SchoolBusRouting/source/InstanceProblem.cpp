@@ -1,6 +1,8 @@
 #include "InstanceProblem.h"
 #include "InstanceLoader.h"
 
+#include <cstring>
+
 namespace SBR
 {
 	InstanceProblem::InstanceProblem(InstanceLoader &loader) :
@@ -40,7 +42,7 @@ namespace SBR
 		for (int i = 0; i < busStopsCount; ++i) {
 			for (int j = 0; j < studentCount; ++j) {
 				// square root isn't calculated since we only care about which distance is lesser
-				reachableStops[i * busStopsCount + j] = (SBR::Position::CalculateDistance2(busStops[i], students[j]) <= maxWalk2) ? 1 : 0;
+				reachableStops[i * studentCount + j] = (SBR::Position::CalculateDistance2(busStops[i], students[j]) <= maxWalk2) ? 1 : 0;
 			}
 		}
 	}
@@ -48,15 +50,20 @@ namespace SBR
 	void InstanceProblem::InitializeDecisionVariables(void)
 	{
 		routes = new bool[busStopsCount * busStopsCount * maxBusCount];
+		memset(routes, 0, busStopsCount * busStopsCount * maxBusCount * sizeof(bool));
+
 		visitedStops = new bool[busStopsCount * maxBusCount];
+		memset(visitedStops, 0, busStopsCount * maxBusCount * sizeof(bool));
+
 		studentBoarding = new bool[busStopsCount * studentCount * maxBusCount];
+		memset(studentBoarding, 0, busStopsCount * studentCount * maxBusCount * sizeof(bool));
 
 		for (int i = 0; i < maxBusCount; ++i) {
 			// each bus stop is visited by a new bus (excepts school)
-			visitedStops[(i+1) * busStopsCount + i] = 1;
+			visitedStops[(i+1) * maxBusCount + i] = 1;
 
-			routes[0 * busStopsCount * maxBusCount + (i+1) * maxBusCount + i] = 1;
-			routes[(i+1) * busStopsCount * maxBusCount + 0 * maxBusCount + i] = 1;
+			routes[(i+1) * maxBusCount + i] = 1;
+			routes[(i+1) * busStopsCount * maxBusCount + i] = 1;
 		}
 	}
 }
