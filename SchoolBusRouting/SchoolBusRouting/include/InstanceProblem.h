@@ -2,6 +2,8 @@
 
 #include "InstanceLoader.h"
 
+#include <cstring>
+
 namespace SBR
 {
 	class InstanceProblem 
@@ -24,5 +26,6 @@ namespace SBR
 		void InitializeReachableStops(void);
 		void InitializeDecisionVariables(void);
 		float CalculateTotalCost(void);
+		std::string PrintRoutes(void);
 	};
 }

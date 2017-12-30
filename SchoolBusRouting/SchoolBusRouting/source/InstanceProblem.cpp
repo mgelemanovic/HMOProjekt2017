@@ -81,4 +81,33 @@ namespace SBR
 		}
 		return sum;
 	}
+
+	std::string InstanceProblem::PrintRoutes(void)
+	{
+		std::string printedRoutes = "";
+		// for every bus
+		for (int k = 0; k < maxBusCount; ++k) {
+			// start from school
+			int i = 0;
+			// and follow the route until you're back at school
+			do {
+				// find next bus stop on route
+				for (int j = 0; j < busStopsCount; ++j) {
+					// when you find it
+					if (routes[i * busStopsCount * maxBusCount + j * maxBusCount + k] == 1) {
+						// remember new but stop
+						i = j;
+						// print it if it's not school stop
+						if (i != 0) {
+							printedRoutes += std::to_string(i);
+						}
+						break;
+					}
+				}
+			} while (i != 0);
+			// go new line for each bus
+			printedRoutes += "\n";
+		}
+		return printedRoutes;
+	}
 }

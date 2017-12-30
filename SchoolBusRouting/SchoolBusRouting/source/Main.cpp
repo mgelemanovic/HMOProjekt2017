@@ -15,7 +15,8 @@ int main(void)
 	const std::vector<SBR::Position>& studentPositions = loader.GetStudentPositions();
 
 	SBR::InstanceProblem problem(loader);
-	std::cout << problem.CalculateTotalCost();
+	std::cout << problem.CalculateTotalCost() << std::endl;
+	std::cout << problem.PrintRoutes() << std::endl;
 
 	getchar();
 	return 0;
