@@ -23,5 +23,6 @@ namespace SBR
 		void InitializeCosts(void);
 		void InitializeReachableStops(void);
 		void InitializeDecisionVariables(void);
+		float CalculateTotalCost(void);
 	};
 }

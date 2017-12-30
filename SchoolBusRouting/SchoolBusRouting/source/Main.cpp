@@ -1,4 +1,7 @@
 #include "InstanceLoader.h"
+#include "InstanceProblem.h"
+
+#include <iostream>
 
 int main(void)
 {
@@ -11,5 +14,9 @@ int main(void)
 	const std::vector<SBR::Position>& busStops = loader.GetStopPositions();
 	const std::vector<SBR::Position>& studentPositions = loader.GetStudentPositions();
 
+	SBR::InstanceProblem problem(loader);
+	std::cout << problem.CalculateTotalCost();
+
 	getchar();
+	return 0;
 }

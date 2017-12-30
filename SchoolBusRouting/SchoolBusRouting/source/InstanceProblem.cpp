@@ -66,4 +66,19 @@ namespace SBR
 			routes[(i+1) * busStopsCount * maxBusCount + i] = 1;
 		}
 	}
+
+	float InstanceProblem::CalculateTotalCost(void)
+	{
+		float sum = 0.0f;
+		for (int i = 0; i < busStopsCount; ++i) {
+			for (int j = 0; j < busStopsCount; ++j) {
+				for (int k = 0; k < maxBusCount; ++k) {
+					if (routes[i * busStopsCount * maxBusCount + j * maxBusCount + k] == 1) {
+						sum += costs[i * busStopsCount + j];
+					}
+				}
+			}
+		}
+		return sum;
+	}
 }
