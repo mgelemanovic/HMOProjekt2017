@@ -14,12 +14,12 @@ namespace SBR
 		const int studentCount;
 		int maxBusCount;
 
-		float *costs;
-		bool *reachableStops;
+		std::vector<float> costs;
+		std::vector<bool> reachableStops;
 
-		bool *routes;
-		bool *visitedStops;
-		bool *studentBoarding;
+		std::vector<bool> routes;
+		std::vector<bool> visitedStops;
+		std::vector<bool> studentBoarding;
 	public:
 		InstanceProblem(InstanceLoader &loader);
 		void InitializeCosts(void);
