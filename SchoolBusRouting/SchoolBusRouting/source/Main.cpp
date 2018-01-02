@@ -2,6 +2,7 @@
 #include "InstanceProblem.h"
 
 #include <iostream>
+#include "MaxFlowFordFulkerson.h"
 
 int main(void)
 {
@@ -17,6 +18,8 @@ int main(void)
 	SBR::InstanceProblem problem(loader);
 	std::cout << problem.CalculateTotalCost() << std::endl;
 	std::cout << problem.PrintRoutes() << std::endl;
+
+	SBR::mainTest();
 
 	getchar();
 	return 0;
