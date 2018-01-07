@@ -20,11 +20,15 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\InstanceLoader.cpp" />
+    <ClCompile Include="source\InstanceProblem.cpp" />
     <ClCompile Include="source\Main.cpp" />
+    <ClCompile Include="source\MaxFlowFordFulkerson.cpp" />
     <ClCompile Include="source\Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\InstanceLoader.h" />
+    <ClInclude Include="include\InstanceProblem.h" />
+    <ClInclude Include="include\MaxFlowFordFulkerson.h" />
     <ClInclude Include="include\Utils.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

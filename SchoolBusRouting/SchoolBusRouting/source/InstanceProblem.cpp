@@ -17,7 +17,9 @@ namespace SBR
 	void InstanceProblem::InitializeCosts(void)
 	{
 		std::vector<SBR::Position> busStops = data.GetStopPositions();
-		costs = new float[busStopsCount * busStopsCount];
+		int costsSize = busStopsCount * busStopsCount;
+		costs = std::vector<float>(costsSize);
+		costs.resize(costsSize);
 
 		for (int i = 0; i < busStopsCount; ++i) {
 			// there is no distance between the same bus stop
@@ -33,7 +35,7 @@ namespace SBR
 	{
 		const std::vector<SBR::Position> busStops = data.GetStopPositions();
 		const std::vector<SBR::Position> students = data.GetStudentPositions();
-		reachableStops = new bool[busStopsCount * studentCount];
+		reachableStops = std::vector<bool>(busStopsCount * studentCount);
 
 		float maxWalk = data.GetMaxWalk();
 		float maxWalk2 = maxWalk * maxWalk;
@@ -47,16 +49,27 @@ namespace SBR
 		}
 	}
 
+	void InitWithZeros(std::vector<bool>& vec)
+	{
+		std::fill(vec.begin(), vec.end(), 0);
+	}
+
 	void InstanceProblem::InitializeDecisionVariables(void)
 	{
-		routes = new bool[busStopsCount * busStopsCount * maxBusCount];
-		memset(routes, 0, busStopsCount * busStopsCount * maxBusCount * sizeof(bool));
+		int routesSize = busStopsCount * busStopsCount * maxBusCount;
+		routes = std::vector<bool>(routesSize);
+		routes.resize(routesSize);
+		InitWithZeros(routes);
 
-		visitedStops = new bool[busStopsCount * maxBusCount];
-		memset(visitedStops, 0, busStopsCount * maxBusCount * sizeof(bool));
+		int visitedStopsSize = busStopsCount * maxBusCount;
+		visitedStops = std::vector<bool>(visitedStopsSize);
+		visitedStops.resize(visitedStopsSize);
+		InitWithZeros(visitedStops);
 
-		studentBoarding = new bool[busStopsCount * studentCount * maxBusCount];
-		memset(studentBoarding, 0, busStopsCount * studentCount * maxBusCount * sizeof(bool));
+		int studentBoardingSize = busStopsCount * studentCount * maxBusCount;
+		studentBoarding = std::vector<bool>(studentBoardingSize);
+		studentBoarding.resize(studentBoardingSize);
+		InitWithZeros(studentBoarding);
 
 		for (int i = 0; i < maxBusCount; ++i) {
 			// each bus stop is visited by a new bus (excepts school)

@@ -24,12 +24,24 @@
     <ClCompile Include="source\Utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\InstanceProblem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\MaxFlowFordFulkerson.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\InstanceLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\InstanceProblem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MaxFlowFordFulkerson.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
