@@ -23,5 +23,7 @@ public:
 	FitnessP evaluate(IndividualP individual);
 	void registerParameters(StateP);
 	bool initialize(StateP);
+private:
+	double evaluate_internal(std::vector<double> angles);
 };
 typedef boost::shared_ptr<SBRFunctionEvalOp> SBRFunctionEvalOpP;
