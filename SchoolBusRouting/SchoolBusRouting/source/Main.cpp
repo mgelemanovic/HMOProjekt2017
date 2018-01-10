@@ -3,8 +3,9 @@
 
 #include <iostream>
 #include "MaxFlowFordFulkerson.h"
+#include "SBRFunctionEvalOp.h"
 
-int main(void)
+int main(int argc, char* argv[])
 {
 	SBR::InstanceLoader loader("instances\\sbr7.txt");
 	SBR::Position pos1(0, 0), pos2(3, 4);
@@ -19,7 +20,13 @@ int main(void)
 	std::cout << problem.CalculateTotalCost() << std::endl;
 	std::cout << problem.PrintRoutes() << std::endl;
 
-	SBR::mainTest();
+	StateP state(new State);
+
+	// set the evaluation operator
+	state->setEvalOp(new SBRFunctionEvalOp);
+
+	state->initialize(argc, argv);
+	state->run();
 
 	getchar();
 	return 0;
