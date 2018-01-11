@@ -2,6 +2,9 @@
 #include<fstream>
 #include<iostream>
 #include "Utils.h"
+#include<boost\math\constants\constants.hpp>
+#include <algorithm>
+
 namespace SBR
 {
 	Position::Position(float x, float y) :
@@ -143,6 +146,11 @@ namespace SBR
 		studentPositions.push_back(Position(x, y));
 	}
 
+	bool PositionComparator(const Position& first, const Position& second)
+	{
+		return first.polarAngle < second.polarAngle;
+	}
+
 	void InstanceLoader::CalculatePolarAngles()
 	{
 		Position posSchool = stopPositions[0];
@@ -151,23 +159,21 @@ namespace SBR
 			double dy = stopPositions[i].y - posSchool.y;
 			double dx = stopPositions[i].x - posSchool.x;
 			double angle = atan2(dy, dx);
-			stopPositionPolarAngles.push_back(angle);
+			angle = angle < 0.0 ? angle + 2 * boost::math::constants::pi<double>() : angle;
+			stopPositions[i].polarAngle = angle;
 		}
 		for (int i = 0; i < studentPositions.size(); ++i)
 		{
 			double dy = studentPositions[i].y - posSchool.y;
 			double dx = studentPositions[i].x - posSchool.x;
-			studentPositionPolarAngles.push_back(atan2(dy, dx));
+			double angle = atan2(dy, dx);
+			angle = angle < 0.0 ? angle + 2 * boost::math::constants::pi<double>() : angle;
+			studentPositions[i].polarAngle = angle;
 		}
+		// sort positions by polar angle to make handling it easier
+		// step over school, just in case
+		std::sort(stopPositions.begin() + 1, stopPositions.end(), PositionComparator);
+		std::sort(studentPositions.begin(), studentPositions.end(), PositionComparator);
 	}
 
-	const std::vector<double>& InstanceLoader::GetStudentPositionPolarAngles()
-	{
-		return studentPositionPolarAngles;
-	}
-
-	const std::vector<double>& InstanceLoader::GetStopPositionPolarAngles()
-	{
-		return stopPositionPolarAngles;
-	}
 }
