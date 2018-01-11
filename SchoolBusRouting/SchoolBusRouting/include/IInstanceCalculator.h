@@ -19,6 +19,6 @@ namespace SBR
 		*   \return double representing value of routing function.
 		*
 		**/
-		virtual double CalculateRoutingCost(vector<vector<Position>> studentsBySector, vector<vector<Position>> busStopsBySector) = 0;
+		virtual double CalculateRoutingCost(vector<vector<Position>>& studentsBySector, vector<vector<Position>>& busStopsBySector) = 0;
 	};
 }

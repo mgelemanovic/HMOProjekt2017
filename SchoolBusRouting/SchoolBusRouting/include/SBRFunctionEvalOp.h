@@ -30,5 +30,15 @@ public:
 	bool initialize(StateP);
 private:
 	double evaluate_internal(std::vector<double> angles);
+	/**
+	*   \brief Method that performs sectoring.
+	*
+	*   Method fills both position vectors based on sectors determined by angles.
+	*
+	*   \param studentsBySector reference to a vector of students that is to be filled.
+	*   \param busStopsBySector reference to a vector of bus stops that is to be filled.
+	*
+	**/
+	void PerformSectoring(std::vector<double>& angles, vector<vector<SBR::Position>>& studentsBySector, vector<vector<SBR::Position>>& busStopsBySector);
 };
 typedef boost::shared_ptr<SBRFunctionEvalOp> SBRFunctionEvalOpP;

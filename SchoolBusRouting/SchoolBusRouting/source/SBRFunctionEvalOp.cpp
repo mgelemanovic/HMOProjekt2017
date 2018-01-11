@@ -53,17 +53,33 @@ FitnessP SBRFunctionEvalOp::evaluate(IndividualP individual)
 	return fitness;
 }
 
-/*
-* This is the function which needs to be implemented to evaluate bus routes based on given angles.
-*/
 double SBRFunctionEvalOp::evaluate_internal(std::vector<double> angles)
 {
 	std::vector<std::vector<SBR::Position>> studentsBySector;
 	std::vector<std::vector<SBR::Position>> busStopsBySector;
 
+	PerformSectoring(angles, studentsBySector, busStopsBySector);
+
+	double routingCost = calculator->CalculateRoutingCost(studentsBySector, busStopsBySector);
+
+	int busCapacity = loader->GetCapacity();
+
+	// add up penalty for having too much students in a sector
+	double penalty = 0.0;
+	for (int i = 0; i < studentsBySector.size(); ++i)
+	{
+		int cntStudents = studentsBySector[i].size();
+		penalty += (cntStudents > busCapacity ? ((cntStudents - busCapacity) * _capacityPenalty) : 0.0);
+	}
+
+	return penalty + routingCost;
+}
+
+void SBRFunctionEvalOp::PerformSectoring(std::vector<double>& angles, vector<vector<SBR::Position>>& studentsBySector, vector<vector<SBR::Position>>& busStopsBySector)
+{
 	const std::vector<SBR::Position>& stopPositions = loader->GetStopPositions();
 	const std::vector<SBR::Position>& studentPositions = loader->GetStudentPositions();
-	
+
 	for (int i = 0; i < angles.size(); ++i)
 	{
 		std::vector<SBR::Position> vec;
@@ -111,18 +127,4 @@ double SBRFunctionEvalOp::evaluate_internal(std::vector<double> angles)
 			idxStudent++;
 		}
 	}
-
-	double routingCost = calculator->CalculateRoutingCost(studentsBySector, busStopsBySector);
-
-	double penalty = 0.0;
-
-	int busCapacity = loader->GetCapacity();
-
-	for (int i = 0; i < studentsBySector.size(); ++i)
-	{
-		int cntStudents = studentsBySector[i].size();
-		penalty += (cntStudents > busCapacity ? ((cntStudents - busCapacity) * _capacityPenalty) : 0.0);
-	}
-
-	return penalty + routingCost;
 }

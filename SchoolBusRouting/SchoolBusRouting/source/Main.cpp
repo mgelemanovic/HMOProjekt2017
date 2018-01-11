@@ -8,7 +8,7 @@
 class DummyInstanceCalculator : public SBR::IInstanceCalculator
 {
 public:
-	virtual double CalculateRoutingCost(vector<vector<SBR::Position>> studentsBySector, vector<vector<SBR::Position>> busStopsBySector)
+	virtual double CalculateRoutingCost(vector<vector<SBR::Position>>& studentsBySector, vector<vector<SBR::Position>>& busStopsBySector)
 	{
 		return 0.0;
 	}
