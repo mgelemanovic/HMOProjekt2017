@@ -28,7 +28,11 @@ namespace SBR
 	{
 	private:
 		std::vector<Position> stopPositions;
+		// polar angles with respect to school as the origin
+		std::vector<double> stopPositionPolarAngles;
 		std::vector<Position> studentPositions;
+		// polar angles with respect to school as the origin
+		std::vector<double> studentPositionPolarAngles;
 		float maxWalk;
 		int capacity;
 	public:
@@ -37,7 +41,11 @@ namespace SBR
 		const std::vector<Position>& GetStudentPositions();
 		float GetMaxWalk();
 		int GetCapacity();
+		const std::vector<double>& GetStudentPositionPolarAngles();
+		const std::vector<double>& GetStopPositionPolarAngles();
 	private:
+		// calculates polar angles for both stop and student positions
+		void CalculatePolarAngles();
 		void Load(const std::string& strFilePath);
 		void ReadStartInfo(const std::string& strLine);
 		void ReadStop(const std::string& strLine);

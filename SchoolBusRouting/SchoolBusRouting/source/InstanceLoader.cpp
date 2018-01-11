@@ -27,6 +27,7 @@ namespace SBR
 	InstanceLoader::InstanceLoader(const std::string& strFilePath)
 	{
 		Load(strFilePath);
+		CalculatePolarAngles();
 	}
 
 	const std::vector<Position>& InstanceLoader::GetStopPositions()
@@ -140,5 +141,33 @@ namespace SBR
 		float y = atof(tokens[Y_INDEX].c_str());
 
 		studentPositions.push_back(Position(x, y));
+	}
+
+	void InstanceLoader::CalculatePolarAngles()
+	{
+		Position posSchool = stopPositions[0];
+		for (int i = 0; i < stopPositions.size(); ++i)
+		{
+			double dy = stopPositions[i].y - posSchool.y;
+			double dx = stopPositions[i].x - posSchool.x;
+			double angle = atan2(dy, dx);
+			stopPositionPolarAngles.push_back(angle);
+		}
+		for (int i = 0; i < studentPositions.size(); ++i)
+		{
+			double dy = posSchool.y - studentPositions[i].y;
+			double dx = posSchool.x - studentPositions[i].x;
+			studentPositionPolarAngles.push_back(atan2(dy, dx));
+		}
+	}
+
+	const std::vector<double>& InstanceLoader::GetStudentPositionPolarAngles()
+	{
+		return studentPositionPolarAngles;
+	}
+
+	const std::vector<double>& InstanceLoader::GetStopPositionPolarAngles()
+	{
+		return stopPositionPolarAngles;
 	}
 }
