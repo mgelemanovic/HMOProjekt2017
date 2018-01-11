@@ -27,6 +27,7 @@
     <ClCompile Include="source\Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\IInstanceCalculator.h" />
     <ClInclude Include="include\InstanceLoader.h" />
     <ClInclude Include="include\InstanceProblem.h" />
     <ClInclude Include="include\MaxFlowFordFulkerson.h" />

@@ -2,6 +2,8 @@
 
 #include <cmath>
 #include "ECF.h"
+#include "InstanceLoader.h"
+#include "IInstanceCalculator.h"
 
 /**
 * \par Description
@@ -18,8 +20,11 @@
 class SBRFunctionEvalOp : public EvaluateOp
 {
 protected:
-	
+	const double _capacityPenalty = 10000.0;
+	SBR::InstanceLoader* loader;
+	SBR::IInstanceCalculator* calculator;
 public:
+	SBRFunctionEvalOp(SBR::InstanceLoader* loader, SBR::IInstanceCalculator* calculator);
 	FitnessP evaluate(IndividualP individual);
 	void registerParameters(StateP);
 	bool initialize(StateP);

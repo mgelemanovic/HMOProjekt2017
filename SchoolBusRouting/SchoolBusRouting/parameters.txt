@@ -8,7 +8,7 @@
 		<FloatingPoint>
 			<Entry key="lbound">0</Entry>
 			<Entry key="ubound">1</Entry>
-			<Entry key="dimension">10</Entry>
+			<Entry key="dimension">34</Entry>
 		</FloatingPoint>
 	</Genotype>
 	<Registry>

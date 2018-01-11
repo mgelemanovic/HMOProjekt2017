@@ -5,6 +5,15 @@
 #include "MaxFlowFordFulkerson.h"
 #include "SBRFunctionEvalOp.h"
 
+class DummyInstanceCalculator : public SBR::IInstanceCalculator
+{
+public:
+	virtual double CalculateRoutingCost(vector<vector<SBR::Position>> studentsBySector, vector<vector<SBR::Position>> busStopsBySector)
+	{
+		return 0.0;
+	}
+};
+
 int main(int argc, char* argv[])
 {
 	SBR::InstanceLoader loader("instances\\sbr7.txt");
@@ -16,14 +25,12 @@ int main(int argc, char* argv[])
 	const std::vector<SBR::Position>& busStops = loader.GetStopPositions();
 	const std::vector<SBR::Position>& studentPositions = loader.GetStudentPositions();
 
-	SBR::InstanceProblem problem(loader);
-	std::cout << problem.CalculateTotalCost() << std::endl;
-	std::cout << problem.PrintRoutes() << std::endl;
+	DummyInstanceCalculator calc;
 
 	StateP state(new State);
 
 	// set the evaluation operator
-	state->setEvalOp(new SBRFunctionEvalOp);
+	state->setEvalOp(new SBRFunctionEvalOp(&loader, &calc));
 
 	state->initialize(argc, argv);
 	state->run();

@@ -14,6 +14,14 @@ namespace SBR
 
 	}
 
+	Position::Position(const Position& other) :
+		x(other.x),
+		y(other.y),
+		polarAngle(other.polarAngle)
+	{
+
+	}
+
 	float Position::CalculateDistance2(const Position& first, const Position& second)
 	{
 		float dx = first.x - second.x;

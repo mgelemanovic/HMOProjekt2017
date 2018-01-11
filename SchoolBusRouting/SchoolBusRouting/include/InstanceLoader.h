@@ -12,6 +12,7 @@ namespace SBR
 		double polarAngle;
 
 		Position(float x, float y);
+		Position(const Position& other);
 
 		static float CalculateDistance2(const Position& first, const Position& second);
 		static float CalculateDistance(const Position& first, const Position& second);
