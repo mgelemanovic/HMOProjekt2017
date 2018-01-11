@@ -155,8 +155,8 @@ namespace SBR
 		}
 		for (int i = 0; i < studentPositions.size(); ++i)
 		{
-			double dy = posSchool.y - studentPositions[i].y;
-			double dx = posSchool.x - studentPositions[i].x;
+			double dy = studentPositions[i].y - posSchool.y;
+			double dx = studentPositions[i].x - posSchool.x;
 			studentPositionPolarAngles.push_back(atan2(dy, dx));
 		}
 	}
