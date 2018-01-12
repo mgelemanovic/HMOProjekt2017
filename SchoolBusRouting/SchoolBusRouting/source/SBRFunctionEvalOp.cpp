@@ -7,7 +7,8 @@
 SBRFunctionEvalOp::SBRFunctionEvalOp(SBR::InstanceLoader* loader, SBR::IInstanceCalculator* calculator)
 	:
 	loader(loader),
-	calculator(calculator)
+	calculator(calculator),
+	manager(loader)
 {
 	
 }
@@ -58,7 +59,7 @@ double SBRFunctionEvalOp::evaluate_internal(std::vector<double> angles)
 	std::vector<std::vector<int>> studentsBySector;
 	std::vector<std::vector<int>> busStopsBySector;
 
-	PerformSectoring(angles, studentsBySector, busStopsBySector);
+	manager.PerformSectoring(angles, studentsBySector, busStopsBySector);
 
 	double routingCost = calculator->CalculateRoutingCost(studentsBySector, busStopsBySector);
 
@@ -75,7 +76,7 @@ double SBRFunctionEvalOp::evaluate_internal(std::vector<double> angles)
 	return penalty + routingCost;
 }
 
-void SBRFunctionEvalOp::PerformSectoring(std::vector<double>& angles, vector<vector<int>>& studentsBySector, vector<vector<int>>& busStopsBySector)
+void SectorManager::PerformSectoring(std::vector<double>& angles, vector<vector<int>>& studentsBySector, vector<vector<int>>& busStopsBySector)
 {
 	const std::vector<SBR::Position>& stopPositions = loader->GetStopPositions();
 	const std::vector<SBR::Position>& studentPositions = loader->GetStudentPositions();

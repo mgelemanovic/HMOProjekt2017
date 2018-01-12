@@ -14,6 +14,14 @@
 * - with FloatingPoint genotype, a number of dimensions and the interval [lbound, ubound] must be set
 */
 
+class SectorManager
+{
+private:
+	SBR::InstanceLoader* loader;
+public:
+	SectorManager(SBR::InstanceLoader* loader) : loader(loader) {}
+	void PerformSectoring(std::vector<double>& angles, vector<vector<int>>& studentsBySector, vector<vector<int>>& busStopsBySector);
+};
 
 /**
 */
@@ -23,6 +31,7 @@ protected:
 	const double _capacityPenalty = 10000.0;
 	SBR::InstanceLoader* loader;
 	SBR::IInstanceCalculator* calculator;
+	SectorManager manager;
 public:
 	SBRFunctionEvalOp(SBR::InstanceLoader* loader, SBR::IInstanceCalculator* calculator);
 	FitnessP evaluate(IndividualP individual);
@@ -39,6 +48,6 @@ private:
 	*   \param busStopsBySector reference to a vector of bus stops that is to be filled.
 	*
 	**/
-	void PerformSectoring(std::vector<double>& angles, vector<vector<int>>& studentsBySector, vector<vector<int>>& busStopsBySector);
+	//void PerformSectoring(std::vector<double>& angles, vector<vector<int>>& studentsBySector, vector<vector<int>>& busStopsBySector);
 };
 typedef boost::shared_ptr<SBRFunctionEvalOp> SBRFunctionEvalOpP;
