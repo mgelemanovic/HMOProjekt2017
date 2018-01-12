@@ -32,23 +32,9 @@ FitnessP SBRFunctionEvalOp::evaluate(IndividualP individual)
 	FloatingPointP gen = boost::dynamic_pointer_cast<FloatingPoint::FloatingPoint> (individual->getGenotype());
 	
 	// the number of variables is read from the genotype itself (size of 'realValue' vector)
-	double realTemp = 0, value = 0;
+	std::vector<double> angles = SBRFunctionEvalOp::GenomeToAngles(gen);
 
-	for (uint i = 0; i < gen->realValue.size(); i++) {
-		realTemp = gen->realValue[i];
-		value += realTemp;
-	}
-
-	double valueSum = value;
-	std::vector<double> angles;
-	for (uint i = 0; i < gen->realValue.size(); ++i)
-	{
-		realTemp = gen->realValue[i];
-		double angle = realTemp / valueSum * 2 * boost::math::constants::pi<double>();
-		angles.push_back(angle);
-	}
-
-	value = evaluate_internal(angles);
+	double value = evaluate_internal(angles);
 
 	fitness->setValue(value);
 	return fitness;
@@ -132,4 +118,26 @@ void SectorManager::PerformSectoring(std::vector<double>& angles, vector<vector<
 			idxStudent++;
 		}
 	}
+
+}
+
+std::vector<double> SBRFunctionEvalOp::GenomeToAngles(FloatingPointP gen)
+{
+	double realTemp = 0, value = 0;
+
+	for (uint i = 0; i < gen->realValue.size(); i++) {
+		realTemp = gen->realValue[i];
+		value += realTemp;
+	}
+
+	double valueSum = value;
+	std::vector<double> angles;
+	for (uint i = 0; i < gen->realValue.size(); ++i)
+	{
+		realTemp = gen->realValue[i];
+		double angle = realTemp / valueSum * 2 * boost::math::constants::pi<double>();
+		angles.push_back(angle);
+	}
+
+	return angles;
 }

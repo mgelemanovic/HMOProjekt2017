@@ -37,6 +37,7 @@ public:
 	FitnessP evaluate(IndividualP individual);
 	void registerParameters(StateP);
 	bool initialize(StateP);
+	static std::vector<double> GenomeToAngles(FloatingPointP gen);
 private:
 	double evaluate_internal(std::vector<double> angles);
 	/**

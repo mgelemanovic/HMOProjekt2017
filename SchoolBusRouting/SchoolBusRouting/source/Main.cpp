@@ -14,16 +14,62 @@ public:
 	}
 };
 
+void ChangeDimensionInFile(int dim);
+void PerformDimensionRun(SBR::InstanceLoader& loader, int dim, int argc, char* argv[]);
+
 int main(int argc, char* argv[])
 {
 	SBR::InstanceLoader loader("instances\\sbr7.txt");
-	SBR::Position pos1(0, 0), pos2(3, 4);
-	float dist = SBR::Position::CalculateDistance(pos1, pos2);
 
-	int cap = loader.GetCapacity();
-	float maxWalk = loader.GetMaxWalk();
-	const std::vector<SBR::Position>& busStops = loader.GetStopPositions();
-	const std::vector<SBR::Position>& studentPositions = loader.GetStudentPositions();
+	int minRoutes = (int) ceil(1.0 * loader.GetStudentPositions().size() / loader.GetCapacity());
+	int step = 5;
+	// -1 stands for school
+	int maxRoutes = loader.GetStopPositions().size() - 1;
+
+	for (int dim = minRoutes; dim <= maxRoutes; dim += step)
+	{
+		PerformDimensionRun(loader, dim, argc, argv);
+	}
+
+	if ((maxRoutes - minRoutes) % step != 0)
+	{
+		PerformDimensionRun(loader, maxRoutes, argc, argv);
+	}
+	
+	getchar();
+	return 0;
+}
+
+void ChangeDimensionInFile(int dim)
+{
+	string strStart = "<Entry key=\"dimension\">";
+	string strNew = std::string("			<Entry key=\"dimension\">") + std::to_string(dim) + "</Entry>";
+	ifstream filein("parameters.txt"); //File to read from
+	if (!filein)
+	{
+		cout << "Error opening files!" << endl;
+		return;
+	}
+
+	string strTemp;
+	string strOut("");
+	while (getline(filein, strTemp))
+	{
+		if (strTemp.find(strStart) != std::string::npos) {
+			strTemp = strNew;
+		}
+		strTemp += "\n";
+		strOut += strTemp;
+	}
+	filein.close();
+	ofstream fileout("parameters.txt");
+	fileout << strOut;
+	fileout.close();
+}
+
+void PerformDimensionRun(SBR::InstanceLoader& loader, int dim, int argc, char* argv[])
+{
+	ChangeDimensionInFile(dim);
 
 	DummyInstanceCalculator calc;
 
@@ -38,13 +84,22 @@ int main(int argc, char* argv[])
 	HallOfFameP hallOfFame = state->getHoF();              // population hall of fame
 	std::vector<IndividualP> best = hallOfFame->getBest();
 
+	SectorManager manager(&loader);
+
 	for (IndividualP individual : best)
 	{
 		FloatingPointP gen = boost::dynamic_pointer_cast<FloatingPoint::FloatingPoint> (individual->getGenotype());
 
+		std::vector<double> angles = SBRFunctionEvalOp::GenomeToAngles(gen);
 
+		std::vector<std::vector<int>> studentsBySector;
+		std::vector<std::vector<int>> busStopsBySector;
+
+		manager.PerformSectoring(angles, studentsBySector, busStopsBySector);
+
+		// decode and write solution
+		// ...
 	}
 
-	getchar();
-	return 0;
+	return;
 }
