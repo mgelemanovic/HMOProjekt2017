@@ -39,6 +39,7 @@ namespace SBR
 	{
 		Load(strFilePath);
 		CalculatePolarAngles();
+		SortIndices();
 	}
 
 	const std::vector<Position>& InstanceLoader::GetStopPositions()
@@ -49,6 +50,16 @@ namespace SBR
 	const std::vector<Position>& InstanceLoader::GetStudentPositions()
 	{
 		return studentPositions;
+	}
+
+	const std::vector<int>& InstanceLoader::GetStopPositionIndicesSorted()
+	{
+		return stopPositionsIndicesSorted;
+	}
+
+	const std::vector<int>& InstanceLoader::GetStudentPositionIndicesSorted()
+	{
+		return studentPositionsIndicesSorted;
 	}
 
 	float InstanceLoader::GetMaxWalk()
@@ -153,11 +164,19 @@ namespace SBR
 
 		studentPositions.push_back(Position(x, y));
 	}
-
-	bool PositionComparator(const Position& first, const Position& second)
+	
+	class PositionComparator
 	{
-		return first.polarAngle < second.polarAngle;
-	}
+	private:
+		const std::vector<Position>& positions;
+	public:
+		PositionComparator(const std::vector<Position>& positions) : positions(positions) {}
+
+		bool operator()(int i, int j)
+		{
+			return positions[i].polarAngle < positions[j].polarAngle;
+		}
+	};
 
 	void InstanceLoader::CalculatePolarAngles()
 	{
@@ -169,19 +188,24 @@ namespace SBR
 			double angle = atan2(dy, dx);
 			angle = angle < 0.0 ? angle + 2 * boost::math::constants::pi<double>() : angle;
 			stopPositions[i].polarAngle = angle;
+			stopPositionsIndicesSorted.push_back(i);
 		}
 		for (int i = 0; i < studentPositions.size(); ++i)
 		{
+			studentPositionsIndicesSorted.push_back(i);
 			double dy = studentPositions[i].y - posSchool.y;
 			double dx = studentPositions[i].x - posSchool.x;
 			double angle = atan2(dy, dx);
 			angle = angle < 0.0 ? angle + 2 * boost::math::constants::pi<double>() : angle;
 			studentPositions[i].polarAngle = angle;
 		}
-		// sort positions by polar angle to make handling it easier
-		// step over school, just in case
-		std::sort(stopPositions.begin() + 1, stopPositions.end(), PositionComparator);
-		std::sort(studentPositions.begin(), studentPositions.end(), PositionComparator);
 	}
 
+	void InstanceLoader::SortIndices()
+	{
+		// sort positions by polar angle to make handling it easier
+		// step over school, just in case
+		std::sort(stopPositionsIndicesSorted.begin() + 1, stopPositionsIndicesSorted.end(), PositionComparator(stopPositions));
+		std::sort(studentPositionsIndicesSorted.begin(), studentPositionsIndicesSorted.end(), PositionComparator(studentPositions));
+	}
 }

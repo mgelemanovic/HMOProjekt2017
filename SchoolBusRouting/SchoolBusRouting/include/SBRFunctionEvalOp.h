@@ -39,6 +39,6 @@ private:
 	*   \param busStopsBySector reference to a vector of bus stops that is to be filled.
 	*
 	**/
-	void PerformSectoring(std::vector<double>& angles, vector<vector<SBR::Position>>& studentsBySector, vector<vector<SBR::Position>>& busStopsBySector);
+	void PerformSectoring(std::vector<double>& angles, vector<vector<int>>& studentsBySector, vector<vector<int>>& busStopsBySector);
 };
 typedef boost::shared_ptr<SBRFunctionEvalOp> SBRFunctionEvalOpP;

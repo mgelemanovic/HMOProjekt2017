@@ -55,8 +55,8 @@ FitnessP SBRFunctionEvalOp::evaluate(IndividualP individual)
 
 double SBRFunctionEvalOp::evaluate_internal(std::vector<double> angles)
 {
-	std::vector<std::vector<SBR::Position>> studentsBySector;
-	std::vector<std::vector<SBR::Position>> busStopsBySector;
+	std::vector<std::vector<int>> studentsBySector;
+	std::vector<std::vector<int>> busStopsBySector;
 
 	PerformSectoring(angles, studentsBySector, busStopsBySector);
 
@@ -75,18 +75,20 @@ double SBRFunctionEvalOp::evaluate_internal(std::vector<double> angles)
 	return penalty + routingCost;
 }
 
-void SBRFunctionEvalOp::PerformSectoring(std::vector<double>& angles, vector<vector<SBR::Position>>& studentsBySector, vector<vector<SBR::Position>>& busStopsBySector)
+void SBRFunctionEvalOp::PerformSectoring(std::vector<double>& angles, vector<vector<int>>& studentsBySector, vector<vector<int>>& busStopsBySector)
 {
 	const std::vector<SBR::Position>& stopPositions = loader->GetStopPositions();
 	const std::vector<SBR::Position>& studentPositions = loader->GetStudentPositions();
+	const std::vector<int>& studentPositionIndicesSorted = loader->GetStudentPositionIndicesSorted();
+	const std::vector<int>& stopPositionIndicesSorted = loader->GetStopPositionIndicesSorted();
 
 	for (int i = 0; i < angles.size(); ++i)
 	{
-		std::vector<SBR::Position> vec;
+		std::vector<int> vec;
 		// add empty student vec
 		studentsBySector.push_back(vec);
 		// add school to bus routes
-		vec.push_back(stopPositions[0]);
+		vec.push_back(0);
 		busStopsBySector.push_back(vec);
 	}
 
@@ -97,14 +99,15 @@ void SBRFunctionEvalOp::PerformSectoring(std::vector<double>& angles, vector<vec
 		int idxStop = 1;
 		while (idxStop < stopPositions.size())
 		{
-			const SBR::Position& busStop = stopPositions[idxStop];
+			int idxCurStop = stopPositionIndicesSorted[idxStop];
+			const SBR::Position& busStop = stopPositions[idxCurStop];
 			if (angleSum < busStop.polarAngle)
 			{
 				double angle = angles[++idxAngle];
 				angleSum += angle;
 				continue;
 			}
-			busStopsBySector[idxAngle].push_back(busStop);
+			busStopsBySector[idxAngle].push_back(idxCurStop);
 			idxStop++;
 		}
 	}
@@ -116,14 +119,15 @@ void SBRFunctionEvalOp::PerformSectoring(std::vector<double>& angles, vector<vec
 		int idxStudent = 0;
 		while (idxStudent < studentPositions.size())
 		{
-			const SBR::Position& studentStop = studentPositions[idxStudent];
+			int idxCurStudent = studentPositionIndicesSorted[idxStudent];
+			const SBR::Position& studentStop = studentPositions[idxCurStudent];
 			if (angleSum < studentStop.polarAngle)
 			{
 				double angle = angles[++idxAngle];
 				angleSum += angle;
 				continue;
 			}
-			studentsBySector[idxAngle].push_back(studentStop);
+			studentsBySector[idxAngle].push_back(idxCurStudent);
 			idxStudent++;
 		}
 	}

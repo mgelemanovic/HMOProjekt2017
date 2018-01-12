@@ -31,6 +31,10 @@ namespace SBR
 	private:
 		std::vector<Position> stopPositions;
 		std::vector<Position> studentPositions;
+
+		std::vector<int> stopPositionsIndicesSorted;
+		std::vector<int> studentPositionsIndicesSorted;
+
 		float maxWalk;
 		int capacity;
 	public:
@@ -40,6 +44,8 @@ namespace SBR
 		const std::vector<Position>& GetStudentPositions();
 		float GetMaxWalk();
 		int GetCapacity();
+		const std::vector<int>& GetStopPositionIndicesSorted();
+		const std::vector<int>& GetStudentPositionIndicesSorted();
 	private:
 		// calculates polar angles for both stop and student positions
 		void CalculatePolarAngles();
@@ -47,6 +53,7 @@ namespace SBR
 		void ReadStartInfo(const std::string& strLine);
 		void ReadStop(const std::string& strLine);
 		void ReadStudent(const std::string& strLine);
+		void SortIndices();
 	};
 
 }
