@@ -35,6 +35,16 @@ int main(int argc, char* argv[])
 	state->initialize(argc, argv);
 	state->run();
 
+	HallOfFameP hallOfFame = state->getHoF();              // population hall of fame
+	std::vector<IndividualP> best = hallOfFame->getBest();
+
+	for (IndividualP individual : best)
+	{
+		FloatingPointP gen = boost::dynamic_pointer_cast<FloatingPoint::FloatingPoint> (individual->getGenotype());
+
+
+	}
+
 	getchar();
 	return 0;
 }
