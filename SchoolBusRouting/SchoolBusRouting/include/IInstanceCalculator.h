@@ -19,6 +19,22 @@ namespace SBR
 		*   \return double representing value of routing function.
 		*
 		**/
-		virtual double CalculateRoutingCost(vector<vector<int>>& studentsBySector, vector<vector<int>>& busStopsBySector) = 0;
+		virtual double CalculateRoutingCost(InstanceLoader* loader, vector<vector<int>>& studentsBySector, vector<vector<int>>& busStopsBySector) = 0;
+	};
+
+	class GreedyInstanceCalculator : public SBR::IInstanceCalculator
+	{
+	private:
+		vector<vector<int>> routes;
+		vector<int> studentStops;
+		vector<int> pickedSectorStops;
+		int currentSector;
+		int missedStudents;
+	private:
+		float PickStops(InstanceLoader* loader, const vector<int>& studentsInSector, const vector<int>& stopsInSector);
+		float CreateRoutes(InstanceLoader* loader, const vector<int>& studentsInSector, const vector<int>& stopsInSector);
+	public:
+		virtual double CalculateRoutingCost(SBR::InstanceLoader* loader, vector<vector<int>>& studentsBySector, vector<vector<int>>& busStopsBySector);
+		void Print(const char* fileName);
 	};
 }

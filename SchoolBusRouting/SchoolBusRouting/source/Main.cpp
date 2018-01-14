@@ -2,17 +2,9 @@
 #include "InstanceProblem.h"
 
 #include <iostream>
+#include <vector>
 #include "MaxFlowFordFulkerson.h"
 #include "SBRFunctionEvalOp.h"
-
-class DummyInstanceCalculator : public SBR::IInstanceCalculator
-{
-public:
-	virtual double CalculateRoutingCost(vector<vector<int>>& studentsBySector, vector<vector<int>>& busStopsBySector)
-	{
-		return 0.0;
-	}
-};
 
 void ChangeDimensionInFile(int dim);
 void PerformDimensionRun(SBR::InstanceLoader& loader, int dim, int argc, char* argv[]);
@@ -21,7 +13,7 @@ int main(int argc, char* argv[])
 {
 	SBR::InstanceLoader loader("instances\\sbr7.txt");
 
-	int minRoutes = (int) ceil(1.0 * loader.GetStudentPositions().size() / loader.GetCapacity());
+	/*int minRoutes = (int)ceil(1.0 * loader.GetStudentPositions().size() / loader.GetCapacity());
 	int step = 5;
 	// -1 stands for school
 	int maxRoutes = loader.GetStopPositions().size() - 1;
@@ -34,7 +26,10 @@ int main(int argc, char* argv[])
 	if ((maxRoutes - minRoutes) % step != 0)
 	{
 		PerformDimensionRun(loader, maxRoutes, argc, argv);
-	}
+	}*/
+
+	// haradcoded dimension to 42
+	PerformDimensionRun(loader, 42, argc, argv);
 	
 	getchar();
 	return 0;
@@ -71,7 +66,7 @@ void PerformDimensionRun(SBR::InstanceLoader& loader, int dim, int argc, char* a
 {
 	ChangeDimensionInFile(dim);
 
-	DummyInstanceCalculator calc;
+	SBR::GreedyInstanceCalculator calc;
 
 	StateP state(new State);
 
@@ -98,7 +93,8 @@ void PerformDimensionRun(SBR::InstanceLoader& loader, int dim, int argc, char* a
 		manager.PerformSectoring(angles, studentsBySector, busStopsBySector);
 
 		// decode and write solution
-		// ...
+		calc.CalculateRoutingCost(&loader, studentsBySector, busStopsBySector);
+		calc.Print("res-ne-sbr7.txt");
 	}
 
 	return;
