@@ -48,7 +48,7 @@ float SBR::GreedyInstanceCalculator::PickStops(SBR::InstanceLoader* loader, cons
 		// if no reachable stop was found
 		if (pickedStopIndex == -1) {
 			// add massive cost and put school as chosen stop
-			totalCost += 1000.0f;
+			totalCost += 500.0f;
 			studentStops[studentsInSector[j]] = 0;
 			missedStudents++;
 			continue;
@@ -71,11 +71,6 @@ float SBR::GreedyInstanceCalculator::PickStops(SBR::InstanceLoader* loader, cons
 		if (!alreadyAdded) {
 			pickedSectorStops.push_back(stopsInSector[pickedStopIndex]);
 		}
-	}
-
-	// if no stop in route is usable, add massive error
-	if (pickedSectorStops.size() == 0) {
-		totalCost += 1e6;
 	}
 
 	return totalCost;
