@@ -1,5 +1,4 @@
 #include "InstanceLoader.h"
-#include "InstanceProblem.h"
 
 #include <iostream>
 #include <vector>
@@ -20,23 +19,9 @@ int main(int argc, char* argv[])
 	// -1 stands for school
 	int maxRoutes = loader.GetStopPositions().size() - 1;
 
-	int dimTest = 3;
-
-	for (int dim = minRoutes; dim <= maxRoutes; dim += step)
-	{
-		for (int i = 0; i < dimTest; ++i)
-		{
-			PerformDimensionRun(loader, dim, argc, argv);
-		}
-	}
-
-	if ((maxRoutes - minRoutes) % step != 0)
-	{
-		PerformDimensionRun(loader, maxRoutes, argc, argv);
-	}
-
-	// haradcoded dimension to 42
-	//PerformDimensionRun(loader, 60, argc, argv);
+	float T = 0.1f;
+	int dimension = minRoutes * (1 - T) + maxRoutes * T;
+	PerformDimensionRun(loader, dimension, argc, argv);
 	
 	getchar();
 	return 0;

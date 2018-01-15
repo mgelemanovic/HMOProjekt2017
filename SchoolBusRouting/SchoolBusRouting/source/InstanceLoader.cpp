@@ -38,6 +38,7 @@ namespace SBR
 	InstanceLoader::InstanceLoader(const std::string& strFilePath)
 	{
 		Load(strFilePath);
+		FindStudentStops();
 		CalculatePolarAngles();
 		SortIndices();
 	}
@@ -60,6 +61,11 @@ namespace SBR
 	const std::vector<int>& InstanceLoader::GetStudentPositionIndicesSorted()
 	{
 		return studentPositionsIndicesSorted;
+	}
+
+	const std::vector<int>& InstanceLoader::GetStudentsInRangeOfStop(int busStopIndex)
+	{
+		return studentsInRange[busStopIndex];
 	}
 
 	float InstanceLoader::GetMaxWalk()
@@ -198,6 +204,24 @@ namespace SBR
 			double angle = atan2(dy, dx);
 			angle = angle < 0.0 ? angle + 2 * boost::math::constants::pi<double>() : angle;
 			studentPositions[i].polarAngle = angle;
+		}
+	}
+
+	void InstanceLoader::FindStudentStops(void)
+	{
+		studentsInRange.push_back(std::vector<int>());
+
+		float maxWalk2 = maxWalk * maxWalk;
+
+		// check if bus stop is reachable by student
+		for (int i = 1; i < stopPositions.size(); ++i) {
+			studentsInRange.push_back(std::vector<int>());
+			for (int j = 0; j < studentPositions.size(); ++j) {
+				// square root isn't calculated since we only care about which distance is lesser
+				if (SBR::Position::CalculateDistance2(stopPositions[i], studentPositions[j]) <= maxWalk2) {
+					studentsInRange[i].push_back(j);
+				}
+			}
 		}
 	}
 

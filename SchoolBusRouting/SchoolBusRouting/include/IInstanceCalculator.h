@@ -5,6 +5,9 @@
 namespace SBR
 {
 	using namespace std;
+
+	struct Graph;
+
 	class IInstanceCalculator
 	{
 	public:
@@ -30,15 +33,17 @@ namespace SBR
 		vector<int> pickedSectorStops;
 		int currentSector;
 		int missedStudents;
-		vector<int> studentCountPerRoute;
+		int overCapacityRoutes;
+		float cost;
 	private:
-		float PickStops(InstanceLoader* loader, const vector<int>& studentsInSector, const vector<int>& stopsInSector);
-		float CreateRoutes(InstanceLoader* loader, const vector<int>& studentsInSector, const vector<int>& stopsInSector);
-		// routes remaining students, returns the value that should be removed
-		float RouteRemainingStudents(SBR::InstanceLoader* loader, vector<vector<int>>& studentsBySector);
-		float CalculateCapacityPenalty(SBR::InstanceLoader* loader);
+		float CalculateCost_internal(void);
+		void CreateInitialRoutes(const vector<int>& stopsInSector);
+		void AddReachableStudents(Graph& g, int currentRoute, int studentStart, InstanceLoader* loader);
+		void PickStops(InstanceLoader* loader, const vector<int>& studentIndices);
+		void AssignStudents(InstanceLoader* loader, int sectors);
+		void CreateRoutes(InstanceLoader* loader, const vector<int>& stopsInSector);
 	public:
 		virtual double CalculateRoutingCost(SBR::InstanceLoader* loader, vector<vector<int>>& studentsBySector, vector<vector<int>>& busStopsBySector);
-		void Print(const char* fileName);
+		void Print(const char* fileName); 
 	};
 }
