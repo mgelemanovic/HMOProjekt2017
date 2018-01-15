@@ -223,6 +223,7 @@ float SBR::GreedyInstanceCalculator::RouteRemainingStudents(SBR::InstanceLoader*
 	const std::vector<SBR::Position>& students = loader->GetStudentPositions();
 	const float maxWalk2 = loader->GetMaxWalk() * loader->GetMaxWalk();
 	const int startMissedStudents = missedStudents;
+	int maxCapacity = loader->GetCapacity();
 	for (int idxSector = 0; idxSector < studentsBySector.size(); ++idxSector)
 	{
 		for (int idx = 0; idx < studentsBySector[idxSector].size(); ++idx)
@@ -243,7 +244,7 @@ float SBR::GreedyInstanceCalculator::RouteRemainingStudents(SBR::InstanceLoader*
 				for (int j = 0; j < routes[i].size(); ++j) {
 					const SBR::Position& stopPosition = stops[routes[i][j]];
 					// if in walkable area, assign
-					if (SBR::Position::CalculateDistance2(stopPosition, studentPosition) < maxWalk2)
+					if (SBR::Position::CalculateDistance2(stopPosition, studentPosition) < maxWalk2 && studentCountPerRoute[i] < maxCapacity)
 					{
 						studentStops[idxStudent] = routes[i][j];
 						missedStudents--;
