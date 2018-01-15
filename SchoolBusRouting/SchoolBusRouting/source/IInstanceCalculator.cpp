@@ -3,8 +3,6 @@
 
 #include <iostream>
 #include <cassert>
-#include <vector>
-#include <string>
 #include <fstream>
 
 using namespace std;
@@ -19,8 +17,10 @@ float SBR::GreedyInstanceCalculator::CalculateCost_internal(void)
 
 void SBR::GreedyInstanceCalculator::CreateInitialRoutes(const vector<int>& stopsInSector)
 {
+	// add new route for sector
 	routes.push_back(std::vector<int>());
 
+	// initial route is all stops in sector (without school, unordered)
 	for (int i = 0; i < stopsInSector.size(); ++i) {
 		if (stopsInSector[i] == 0) {
 			continue;
@@ -31,6 +31,7 @@ void SBR::GreedyInstanceCalculator::CreateInitialRoutes(const vector<int>& stops
 
 void SBR::GreedyInstanceCalculator::AddReachableStudents(Graph& g, int currentRoute, int studentStart, InstanceLoader* loader)
 {
+	// find a set of students that can reach this bus route
 	std::vector<int> students;
 	for (int i = 0; i < routes[currentRoute].size(); ++i) {
 		const std::vector<int>& reachableStudents = loader->GetStudentsInRangeOfStop(routes[currentRoute][i]);
@@ -49,6 +50,7 @@ void SBR::GreedyInstanceCalculator::AddReachableStudents(Graph& g, int currentRo
 		}
 	}
 
+	// create edges from bus routes to reachable students, with capacity of 1
 	for (int i = 0; i < students.size(); ++i) {
 		g.AddEdge(currentRoute + 1, studentStart + students[i], 1);
 	}
@@ -67,21 +69,27 @@ void SBR::GreedyInstanceCalculator::PickStops(InstanceLoader* loader, const vect
 	float maxWalk = loader->GetMaxWalk();
 	float maxWalk2 = maxWalk * maxWalk;
 
+	// check capacity constraint
 	float capacity = loader->GetCapacity();
 	if (studentCount > capacity) {
 		overCapacityRoutes += (studentCount - capacity);
 	}
 
+	// determine which stops are visited by students
 	for (int i = 0; i < studentCount; ++i) {
 		for (int j = 0; j < pickedSectorStops.size(); ++j) {
+			// student picks first reachable stop in the route
 			if (SBR::Position::CalculateDistance2(students[studentIndices[i]], stops[pickedSectorStops[j]]) < maxWalk2) {
+				// remember that stop is being used
 				visitedStops[j] = true;
+				// remember where this student is going
 				studentStops[studentIndices[i]] = pickedSectorStops[j];
 				break;
 			}
 		}
 	}
 
+	// final route will only contain those stops that are visited by atleast one student
 	assert(visitedStops.size() == pickedSectorStops.size());
 	for (int i = 0; i < visitedStops.size(); ++i) {
 		if (visitedStops[i]) {
@@ -93,65 +101,57 @@ void SBR::GreedyInstanceCalculator::PickStops(InstanceLoader* loader, const vect
 void SBR::GreedyInstanceCalculator::AssignStudents(InstanceLoader* loader, int sectors)
 {
 	int studentCount = loader->GetStudentPositions().size();
-	// school node + route nodes + student nodes + final node
+	// at which index student nodes start
 	int studentNodesStart = sectors + 1;
+	// school node + route nodes + student nodes + final node
 	int totalGraphNodes = studentNodesStart + studentCount + 1;
 	if (studentStops.size() == 0) {
 		studentStops.resize(studentCount);
 	}
 
+	// create graph that will be used in Ford-Fulkerson algorithm to determine student/route assigments
 	int capacity = loader->GetCapacity();
 	Graph g(totalGraphNodes);
 	for (int i = 0; i < sectors; ++i) {
 		// add edges that go from school to bus routes, with bus capacity
 		g.AddEdge(0, i + 1, capacity);
+		// connect route nodes with reachable students
 		AddReachableStudents(g, i, studentNodesStart, loader);
-
 	}
 
 	for (int i = 0; i < studentCount; ++i) {
-		// edges that go from students to end
+		// edges that go from students to end node
 		g.AddEdge(studentNodesStart + i, totalGraphNodes - 1, 1);
 	}
 
+	// run max flow Ford-Fulkerson algorithm
 	int d = g.MaxFlow(0, totalGraphNodes - 1);
+	// check if some students weren't assigned a route
 	missedStudents = studentCount - d;
 
-	//std::cout << "Missed students: " << missedStudents << std::endl;
-
-	/*for (int i = 0; i < studentCount; ++i) {
-		std::cout << "Student " << i << " goes to route:";
-		for (int j = 0; j < g.adj[studentNodesStart + i].size(); ++j) {
-			if (g.adj[studentNodesStart + i][j].flow == -1) {
-				std::cout << " " << g.adj[studentNodesStart + i][j].dst;
-			}
-		}
-		std::cout << std::endl;
-	}*/
-
+	// go through sectors (routes) and discover which students are in that route
 	for (currentSector = 0; currentSector < sectors; ++currentSector) {
 		int i = currentSector;
-		//std::cout << "Bus " << i << " picked student:";
 		std::vector<int> pickedStudents;
+		// if flow from route node to student node is 1, that means student is using that bus route
 		for (int j = 0; j < g.adj[i+1].size(); ++j) {
 			if (g.adj[i+1][j].flow == 1) {
+				// remember student index
 				int studentIndex = g.adj[i + 1][j].dst - studentNodesStart;
 				pickedStudents.push_back(studentIndex);
-				//std::cout << " " << studentIndex;
 			}
 		}
-		//std::cout << std::endl;
+		// discover used bus stops
 		PickStops(loader, pickedStudents);
 	}
-
-	return;
 }
 
-void SBR::GreedyInstanceCalculator::CreateRoutes(InstanceLoader* loader, const vector<int>& stopsInSector)
+void SBR::GreedyInstanceCalculator::CreateRoutes(InstanceLoader* loader)
 {
 	const vector<int> pickedSectorStops = routes[currentSector];
 	routes[currentSector].clear();
 
+	// nothing to do here if no stops are used in this sector
 	if (pickedSectorStops.size() == 0) {
 		return;
 	}
@@ -210,7 +210,7 @@ void SBR::GreedyInstanceCalculator::CreateRoutes(InstanceLoader* loader, const v
 		}
 
 		// add cost of traveling from one stop to next
-		cost += sqrt(minDistance);
+		cost += sqrt(minDistanceNext);
 		routes[currentSector].push_back(pickedSectorStops[nextStop]);
 	}
 
@@ -221,25 +221,22 @@ void SBR::GreedyInstanceCalculator::CreateRoutes(InstanceLoader* loader, const v
 	cost += SBR::Position::CalculateDistance(school, stops[routes[currentSector][routes[currentSector].size() - 1]]);
 }
 
-double SBR::GreedyInstanceCalculator::CalculateRoutingCost(SBR::InstanceLoader* loader, vector<vector<int>>& studentsBySector, vector<vector<int>>& busStopsBySector)
+double SBR::GreedyInstanceCalculator::CalculateRoutingCost(SBR::InstanceLoader* loader, vector<vector<int>>& busStopsBySector)
 {
-	int sectors = studentsBySector.size();
-	assert(sectors == busStopsBySector.size());
+	int sectors = busStopsBySector.size();
 
 	missedStudents = 0;
 	overCapacityRoutes = 0;
 
 	routes.clear();
 	for (currentSector = 0; currentSector < sectors; ++currentSector) {
-		// create initial routes (route is set here, just using all stops in sector)
 		CreateInitialRoutes(busStopsBySector[currentSector]);
 	}
 	
 	AssignStudents(loader, sectors);
 
 	for (currentSector = 0; currentSector < sectors; ++currentSector) {
-		// from picked stops in sector create final routes and calculate cost of traversing it
-		CreateRoutes(loader, busStopsBySector[currentSector]);
+		CreateRoutes(loader);
 	}
 
 
@@ -250,6 +247,7 @@ void SBR::GreedyInstanceCalculator::Print(const char* fileName)
 {
 	ofstream fileout(fileName);
 
+	// print used bus routes
 	for (int i = 0; i < routes.size(); ++i) {
 		if (routes[i].size() == 0) {
 			continue;
@@ -262,6 +260,7 @@ void SBR::GreedyInstanceCalculator::Print(const char* fileName)
 	}
 	fileout << endl;
 
+	// print which stops are used by students
 	for (int i = 0; i < studentStops.size(); ++i) {
 		fileout << (i + 1) << " " << studentStops[i] << endl;
 	}

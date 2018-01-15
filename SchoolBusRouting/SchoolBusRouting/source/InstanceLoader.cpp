@@ -58,11 +58,6 @@ namespace SBR
 		return stopPositionsIndicesSorted;
 	}
 
-	const std::vector<int>& InstanceLoader::GetStudentPositionIndicesSorted()
-	{
-		return studentPositionsIndicesSorted;
-	}
-
 	const std::vector<int>& InstanceLoader::GetStudentsInRangeOfStop(int busStopIndex)
 	{
 		return studentsInRange[busStopIndex];
@@ -198,7 +193,6 @@ namespace SBR
 		}
 		for (int i = 0; i < studentPositions.size(); ++i)
 		{
-			studentPositionsIndicesSorted.push_back(i);
 			double dy = studentPositions[i].y - posSchool.y;
 			double dx = studentPositions[i].x - posSchool.x;
 			double angle = atan2(dy, dx);
@@ -230,6 +224,5 @@ namespace SBR
 		// sort positions by polar angle to make handling it easier
 		// step over school, just in case
 		std::sort(stopPositionsIndicesSorted.begin() + 1, stopPositionsIndicesSorted.end(), PositionComparator(stopPositions));
-		std::sort(studentPositionsIndicesSorted.begin(), studentPositionsIndicesSorted.end(), PositionComparator(studentPositions));
 	}
 }

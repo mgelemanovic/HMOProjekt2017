@@ -42,26 +42,19 @@ FitnessP SBRFunctionEvalOp::evaluate(IndividualP individual)
 
 double SBRFunctionEvalOp::evaluate_internal(std::vector<double> angles)
 {
-	std::vector<std::vector<int>> studentsBySector;
 	std::vector<std::vector<int>> busStopsBySector;
-
-	manager.PerformSectoring(angles, studentsBySector, busStopsBySector);
-
-	return calculator->CalculateRoutingCost(loader, studentsBySector, busStopsBySector);
+	manager.PerformSectoring(angles, busStopsBySector);
+	return calculator->CalculateRoutingCost(loader, busStopsBySector);
 }
 
-void SectorManager::PerformSectoring(std::vector<double>& angles, vector<vector<int>>& studentsBySector, vector<vector<int>>& busStopsBySector)
+void SectorManager::PerformSectoring(std::vector<double>& angles, vector<vector<int>>& busStopsBySector)
 {
 	const std::vector<SBR::Position>& stopPositions = loader->GetStopPositions();
-	const std::vector<SBR::Position>& studentPositions = loader->GetStudentPositions();
-	const std::vector<int>& studentPositionIndicesSorted = loader->GetStudentPositionIndicesSorted();
 	const std::vector<int>& stopPositionIndicesSorted = loader->GetStopPositionIndicesSorted();
 
 	for (int i = 0; i < angles.size(); ++i)
 	{
 		std::vector<int> vec;
-		// add empty student vec
-		studentsBySector.push_back(vec);
 		// add school to bus routes
 		vec.push_back(0);
 		busStopsBySector.push_back(vec);
@@ -86,27 +79,6 @@ void SectorManager::PerformSectoring(std::vector<double>& angles, vector<vector<
 			idxStop++;
 		}
 	}
-
-	{
-		double angleSum = 0.0;
-		int idxAngle = -1;
-
-		int idxStudent = 0;
-		while (idxStudent < studentPositions.size())
-		{
-			int idxCurStudent = studentPositionIndicesSorted[idxStudent];
-			const SBR::Position& studentStop = studentPositions[idxCurStudent];
-			if (angleSum < studentStop.polarAngle)
-			{
-				double angle = angles[++idxAngle];
-				angleSum += angle;
-				continue;
-			}
-			studentsBySector[idxAngle].push_back(idxCurStudent);
-			idxStudent++;
-		}
-	}
-
 }
 
 std::vector<double> SBRFunctionEvalOp::GenomeToAngles(FloatingPointP gen)

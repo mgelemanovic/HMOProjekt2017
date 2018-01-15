@@ -1,29 +1,25 @@
 #include "InstanceLoader.h"
-
-#include <iostream>
-#include <vector>
-#include "MaxFlowFordFulkerson.h"
 #include "SBRFunctionEvalOp.h"
+
+#define SBR_USED_INSTANCE 1		// from 1 to 10
+#define SBR_MAX_RUN_TIME 1		// from 0 to 2
 
 void ChangeDimensionInFile(int dim);
 void PerformDimensionRun(SBR::InstanceLoader& loader, int dim, int argc, char* argv[]);
 
-double minVal = std::numeric_limits<double>::max();
 
 int main(int argc, char* argv[])
 {
-	SBR::InstanceLoader loader("instances\\sbr1.txt");
+	SBR::InstanceLoader loader("instances\\sbr" + std::to_string(SBR_USED_INSTANCE) + ".txt");
 
 	int minRoutes = (int)ceil(1.0 * loader.GetStudentPositions().size() / loader.GetCapacity());
-	int step = 5;
 	// -1 stands for school
 	int maxRoutes = loader.GetStopPositions().size() - 1;
 
 	float T = 0.1f;
-	int dimension = minRoutes * (1 - T) + maxRoutes * T;
+	int dimension = (int)(minRoutes * (1 - T) + maxRoutes * T);
 	PerformDimensionRun(loader, dimension, argc, argv);
-	
-	getchar();
+
 	return 0;
 }
 
@@ -77,6 +73,7 @@ void PerformDimensionRun(SBR::InstanceLoader& loader, int dim, int argc, char* a
 
 	HallOfFameP hallOfFame = state->getHoF();              // population hall of fame
 	std::vector<IndividualP> best = hallOfFame->getBest();
+	assert(best.size() == 1);
 
 	SectorManager manager(&loader);
 
@@ -86,18 +83,16 @@ void PerformDimensionRun(SBR::InstanceLoader& loader, int dim, int argc, char* a
 
 		std::vector<double> angles = SBRFunctionEvalOp::GenomeToAngles(gen);
 
-		std::vector<std::vector<int>> studentsBySector;
 		std::vector<std::vector<int>> busStopsBySector;
 
-		manager.PerformSectoring(angles, studentsBySector, busStopsBySector);
+		manager.PerformSectoring(angles, busStopsBySector);
 
 		// decode and write solution
-		double val = calc.CalculateRoutingCost(&loader, studentsBySector, busStopsBySector);
-		if (val < minVal)
-		{
-			calc.Print("res-ne-sbr7.txt");
-			minVal = val;
-		}
+		calc.CalculateRoutingCost(&loader, busStopsBySector);
+		
+		std::string runtimeStrings[] = { "ne", "1m", "5m" };
+		std::string outputFile("output\\res-" + runtimeStrings[SBR_MAX_RUN_TIME] + "-sbr" + std::to_string(SBR_USED_INSTANCE) + ".txt");
+		calc.Print(outputFile.c_str());
 	}
 
 	return;

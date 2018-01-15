@@ -20,7 +20,7 @@ private:
 	SBR::InstanceLoader* loader;
 public:
 	SectorManager(SBR::InstanceLoader* loader) : loader(loader) {}
-	void PerformSectoring(std::vector<double>& angles, vector<vector<int>>& studentsBySector, vector<vector<int>>& busStopsBySector);
+	void PerformSectoring(std::vector<double>& angles, vector<vector<int>>& busStopsBySector);
 };
 
 /**

@@ -33,7 +33,6 @@ namespace SBR
 		std::vector<Position> studentPositions;
 
 		std::vector<int> stopPositionsIndicesSorted;
-		std::vector<int> studentPositionsIndicesSorted;
 
 		// which students can walk to bus stops
 		std::vector<std::vector<int>> studentsInRange;
@@ -48,7 +47,6 @@ namespace SBR
 		float GetMaxWalk();
 		int GetCapacity();
 		const std::vector<int>& GetStopPositionIndicesSorted();
-		const std::vector<int>& GetStudentPositionIndicesSorted();
 		const std::vector<int>& GetStudentsInRangeOfStop(int busStopIndex);
 	private:
 		// calculates polar angles for both stop and student positions
