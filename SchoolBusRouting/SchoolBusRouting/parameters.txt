@@ -1,24 +1,24 @@
 <ECF>
 	<Algorithm>
-		<SteadyStateTournament>
-			<Entry key="tsize">3</Entry>
-		</SteadyStateTournament>
-	</Algorithm>
+        <RouletteWheel>
+                <Entry key="crxprob">0.6</Entry>          <!-- crossover rate -->
+                <Entry key="selpressure">50</Entry>       <!-- selection pressure: how much the best individual is 'better' than the worst -->
+                <Entry key="elitism">3</Entry>             <!-- is the best individual preserved -->
+        </RouletteWheel>
+  </Algorithm>
 	<Genotype>
 		<FloatingPoint>
 			<Entry key="lbound">0</Entry>
 			<Entry key="ubound">1</Entry>
-			<Entry key="dimension">81</Entry>
+			<Entry key="dimension">61</Entry>
 		</FloatingPoint>
 	</Genotype>
 	<Registry>
-		<Entry key="population.size">500</Entry>
-		<Entry key="mutation.indprob">0.3</Entry>
-		<Entry key="term.maxgen">500</Entry>
-		<Entry key="term.eval">100000</Entry>
-		<Entry key="term.fitnessval">1e-12</Entry>
+		<Entry key="population.size">50</Entry>
+		<Entry key="mutation.indprob">0.7</Entry>
+		<Entry key="term.stagnation">200</Entry> <!-- max number of consecutive generations without improvement (default: 5000 / pop_size) -->
+    <Entry key="term.maxtime">60</Entry>
 		<Entry key="log.frequency">10</Entry>
 		<Entry key="log.level">3</Entry>
-		<Entry key="term.maxtime">15</Entry> <!-- max number of seconds to run (default: none) -->
 	</Registry>
 </ECF>

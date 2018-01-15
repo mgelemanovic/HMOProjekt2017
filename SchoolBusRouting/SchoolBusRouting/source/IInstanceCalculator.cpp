@@ -8,6 +8,9 @@
 
 using namespace std;
 
+const float missedStudentPenalty = 500.0f;
+const float maxCapacityPenalty = 1000.0f;
+
 float SBR::GreedyInstanceCalculator::PickStops(SBR::InstanceLoader* loader, const vector<int>& studentsInSector, const vector<int>& stopsInSector)
 {
 	float totalCost = 0.0f;
@@ -48,7 +51,7 @@ float SBR::GreedyInstanceCalculator::PickStops(SBR::InstanceLoader* loader, cons
 		// if no reachable stop was found
 		if (pickedStopIndex == -1) {
 			// add massive cost and put school as chosen stop
-			totalCost += 500.0f;
+			totalCost += missedStudentPenalty;
 			studentStops[studentsInSector[j]] = 0;
 			missedStudents++;
 			continue;
@@ -56,6 +59,7 @@ float SBR::GreedyInstanceCalculator::PickStops(SBR::InstanceLoader* loader, cons
 		else {
 			// otherwise, remember student's stop
 			studentStops[studentsInSector[j]] = stopsInSector[pickedStopIndex];
+			studentCountPerRoute[currentSector]++;
 		}
 
 		// go through list of stops already used in sector
@@ -79,7 +83,7 @@ float SBR::GreedyInstanceCalculator::PickStops(SBR::InstanceLoader* loader, cons
 float SBR::GreedyInstanceCalculator::CreateRoutes(InstanceLoader* loader, const vector<int>& studentsInSector, const vector<int>& stopsInSector)
 {
 	float totalCost = 0.0f;
-
+	
 	const std::vector<SBR::Position>& stops = loader->GetStopPositions();
 	SBR::Position school = stops[0];
 
@@ -164,6 +168,8 @@ double SBR::GreedyInstanceCalculator::CalculateRoutingCost(SBR::InstanceLoader* 
 		const vector<int>& studentsInSector = studentsBySector[currentSector];
 		const vector<int>& stopsInSector = busStopsBySector[currentSector];
 
+		studentCountPerRoute.push_back(0);
+
 		totalCost += PickStops(loader, studentsInSector, stopsInSector);
 		if (pickedSectorStops.size() == 0) {
 			continue;
@@ -171,6 +177,12 @@ double SBR::GreedyInstanceCalculator::CalculateRoutingCost(SBR::InstanceLoader* 
 
 		totalCost += CreateRoutes(loader, studentsInSector, stopsInSector);
 	}
+
+	// try to find stops for the students that don't have assigned bus stop
+	totalCost += RouteRemainingStudents(loader, studentsBySector);
+
+	totalCost += CalculateCapacityPenalty(loader);
+
 	return totalCost;
 }
 
@@ -198,4 +210,68 @@ void SBR::GreedyInstanceCalculator::Print(const char* fileName)
 	fileout.close();
 
 	cout << "Missed students: " << missedStudents << endl;
+}
+
+float SBR::GreedyInstanceCalculator::RouteRemainingStudents(SBR::InstanceLoader* loader, vector<vector<int>>& studentsBySector)
+{
+	if (missedStudents == 0)
+	{
+		return 0.0f;
+	}
+	float penalty = 0.0f;
+	const std::vector<SBR::Position>& stops = loader->GetStopPositions();
+	const std::vector<SBR::Position>& students = loader->GetStudentPositions();
+	const float maxWalk2 = loader->GetMaxWalk() * loader->GetMaxWalk();
+	const int startMissedStudents = missedStudents;
+	for (int idxSector = 0; idxSector < studentsBySector.size(); ++idxSector)
+	{
+		for (int idx = 0; idx < studentsBySector[idxSector].size(); ++idx)
+		{
+			int idxStudent = studentsBySector[idxSector][idx];
+			bool studentPlaced = false;
+			// continue if student was assigned
+			if (studentStops[idxStudent] != 0)
+			{
+				continue;
+			}
+			const SBR::Position& studentPosition = students[idxStudent];
+			// find stop on route that is in max walk
+			for (int i = 0; i < routes.size(); ++i) {
+				if (routes[i].size() == 0) {
+					continue;
+				}
+				for (int j = 0; j < routes[i].size(); ++j) {
+					const SBR::Position& stopPosition = stops[routes[i][j]];
+					// if in walkable area, assign
+					if (SBR::Position::CalculateDistance2(stopPosition, studentPosition) < maxWalk2)
+					{
+						studentStops[idxStudent] = routes[i][j];
+						missedStudents--;
+						penalty -= missedStudentPenalty;
+						studentCountPerRoute[i]++;
+						studentPlaced = true;
+						break;
+					}
+				}
+				if (studentPlaced)
+				{
+					break;
+				}
+			}
+		}
+	}
+	return penalty;
+}
+
+float SBR::GreedyInstanceCalculator::CalculateCapacityPenalty(SBR::InstanceLoader* loader)
+{
+	float penalty = 0;
+	int maxCapacity = loader->GetCapacity();
+	for (int i = 0; i < studentCountPerRoute.size(); ++i)
+	{
+		int overhead = studentCountPerRoute[i] - maxCapacity;
+		overhead = overhead > 0 ? overhead : 0;
+		penalty += maxCapacityPenalty * overhead;
+	}
+	return penalty;
 }

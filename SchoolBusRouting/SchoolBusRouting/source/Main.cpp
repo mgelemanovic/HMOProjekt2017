@@ -9,27 +9,34 @@
 void ChangeDimensionInFile(int dim);
 void PerformDimensionRun(SBR::InstanceLoader& loader, int dim, int argc, char* argv[]);
 
+double minVal = std::numeric_limits<double>::max();
+
 int main(int argc, char* argv[])
 {
-	SBR::InstanceLoader loader("instances\\sbr7.txt");
+	SBR::InstanceLoader loader("instances\\sbr1.txt");
 
-	/*int minRoutes = (int)ceil(1.0 * loader.GetStudentPositions().size() / loader.GetCapacity());
+	int minRoutes = (int)ceil(1.0 * loader.GetStudentPositions().size() / loader.GetCapacity());
 	int step = 5;
 	// -1 stands for school
 	int maxRoutes = loader.GetStopPositions().size() - 1;
 
+	int dimTest = 3;
+
 	for (int dim = minRoutes; dim <= maxRoutes; dim += step)
 	{
-		PerformDimensionRun(loader, dim, argc, argv);
+		for (int i = 0; i < dimTest; ++i)
+		{
+			PerformDimensionRun(loader, dim, argc, argv);
+		}
 	}
 
 	if ((maxRoutes - minRoutes) % step != 0)
 	{
 		PerformDimensionRun(loader, maxRoutes, argc, argv);
-	}*/
+	}
 
 	// haradcoded dimension to 42
-	PerformDimensionRun(loader, 42, argc, argv);
+	//PerformDimensionRun(loader, 60, argc, argv);
 	
 	getchar();
 	return 0;
@@ -64,6 +71,8 @@ void ChangeDimensionInFile(int dim)
 
 void PerformDimensionRun(SBR::InstanceLoader& loader, int dim, int argc, char* argv[])
 {
+	cout << "Running algorithm for " << dim << " buses." << endl;
+
 	ChangeDimensionInFile(dim);
 
 	SBR::GreedyInstanceCalculator calc;
@@ -74,6 +83,11 @@ void PerformDimensionRun(SBR::InstanceLoader& loader, int dim, int argc, char* a
 	state->setEvalOp(new SBRFunctionEvalOp(&loader, &calc));
 
 	state->initialize(argc, argv);
+
+	int* maxTime = (int*)state->getRegistry().get()->getEntry("term.maxtime").get();
+
+	cout << "Time limit is set to: " << *maxTime << endl;
+
 	state->run();
 
 	HallOfFameP hallOfFame = state->getHoF();              // population hall of fame
@@ -93,8 +107,12 @@ void PerformDimensionRun(SBR::InstanceLoader& loader, int dim, int argc, char* a
 		manager.PerformSectoring(angles, studentsBySector, busStopsBySector);
 
 		// decode and write solution
-		calc.CalculateRoutingCost(&loader, studentsBySector, busStopsBySector);
-		calc.Print("res-ne-sbr7.txt");
+		double val = calc.CalculateRoutingCost(&loader, studentsBySector, busStopsBySector);
+		if (val < minVal)
+		{
+			calc.Print("res-ne-sbr7.txt");
+			minVal = val;
+		}
 	}
 
 	return;

@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="source\IInstanceCalculator.cpp" />
     <ClCompile Include="source\InstanceLoader.cpp" />
     <ClCompile Include="source\InstanceProblem.cpp" />
     <ClCompile Include="source\Main.cpp" />

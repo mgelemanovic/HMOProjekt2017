@@ -28,7 +28,7 @@ public:
 class SBRFunctionEvalOp : public EvaluateOp
 {
 protected:
-	const double _capacityPenalty = 10000.0;
+	const double _capacityPenalty = 1e12;
 	SBR::InstanceLoader* loader;
 	SBR::IInstanceCalculator* calculator;
 	SectorManager manager;

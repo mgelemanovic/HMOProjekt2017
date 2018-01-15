@@ -30,9 +30,13 @@ namespace SBR
 		vector<int> pickedSectorStops;
 		int currentSector;
 		int missedStudents;
+		vector<int> studentCountPerRoute;
 	private:
 		float PickStops(InstanceLoader* loader, const vector<int>& studentsInSector, const vector<int>& stopsInSector);
 		float CreateRoutes(InstanceLoader* loader, const vector<int>& studentsInSector, const vector<int>& stopsInSector);
+		// routes remaining students, returns the value that should be removed
+		float RouteRemainingStudents(SBR::InstanceLoader* loader, vector<vector<int>>& studentsBySector);
+		float CalculateCapacityPenalty(SBR::InstanceLoader* loader);
 	public:
 		virtual double CalculateRoutingCost(SBR::InstanceLoader* loader, vector<vector<int>>& studentsBySector, vector<vector<int>>& busStopsBySector);
 		void Print(const char* fileName);

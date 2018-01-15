@@ -47,7 +47,6 @@ double SBRFunctionEvalOp::evaluate_internal(std::vector<double> angles)
 
 	manager.PerformSectoring(angles, studentsBySector, busStopsBySector);
 
-	double routingCost = calculator->CalculateRoutingCost(loader, studentsBySector, busStopsBySector);
 
 	int busCapacity = loader->GetCapacity();
 
@@ -58,6 +57,13 @@ double SBRFunctionEvalOp::evaluate_internal(std::vector<double> angles)
 		int cntStudents = studentsBySector[i].size();
 		penalty += (cntStudents > busCapacity ? ((cntStudents - busCapacity) * _capacityPenalty) : 0.0);
 	}
+
+	if (penalty > 0.0)
+	{
+		return penalty;
+	}
+
+	double routingCost = calculator->CalculateRoutingCost(loader, studentsBySector, busStopsBySector);
 
 	return penalty + routingCost;
 }

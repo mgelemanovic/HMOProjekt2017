@@ -33,6 +33,9 @@
     <ClCompile Include="source\SBRFunctionEvalOp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\IInstanceCalculator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\InstanceLoader.h">
