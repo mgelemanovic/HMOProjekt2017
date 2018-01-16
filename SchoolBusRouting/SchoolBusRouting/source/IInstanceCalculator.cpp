@@ -5,6 +5,8 @@
 #include <cassert>
 #include <fstream>
 
+#include <set>
+
 using namespace std;
 
 const float missedStudentPenalty = 500.0f;
@@ -32,27 +34,21 @@ void SBR::GreedyInstanceCalculator::CreateInitialRoutes(const vector<int>& stops
 void SBR::GreedyInstanceCalculator::AddReachableStudents(Graph& g, int currentRoute, int studentStart, InstanceLoader* loader)
 {
 	// find a set of students that can reach this bus route
-	std::vector<int> students;
+	std::set<int> students;
 	for (int i = 0; i < routes[currentRoute].size(); ++i) {
 		const std::vector<int>& reachableStudents = loader->GetStudentsInRangeOfStop(routes[currentRoute][i]);
 		for (int j = 0; j < reachableStudents.size(); ++j)  {
-			bool alreadyAdded = false;
-			for (int k = 0; k < students.size(); ++k) {
-				if (students[k] == reachableStudents[j]) {
-					alreadyAdded = true;
-					break;
-				}
-			}
+			bool alreadyAdded = students.find(reachableStudents[j]) != students.end();
 
 			if (!alreadyAdded) {
-				students.push_back(reachableStudents[j]);
+				students.insert(reachableStudents[j]);
 			}
 		}
 	}
 
 	// create edges from bus routes to reachable students, with capacity of 1
-	for (int i = 0; i < students.size(); ++i) {
-		g.AddEdge(currentRoute + 1, studentStart + students[i], 1);
+	for (auto it = students.begin(); it != students.end(); ++it) {
+		g.AddEdge(currentRoute + 1, studentStart + *it, 1);
 	}
 }
 
