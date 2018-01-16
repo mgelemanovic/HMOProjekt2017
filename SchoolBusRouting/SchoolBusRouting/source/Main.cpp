@@ -1,8 +1,8 @@
 #include "InstanceLoader.h"
 #include "SBRFunctionEvalOp.h"
 
-#define SBR_USED_INSTANCE 1		// from 1 to 10
-#define SBR_MAX_RUN_TIME 1		// from 0 to 2
+#define SBR_USED_INSTANCE 10		// from 1 to 10
+#define SBR_MAX_RUN_TIME 0		// from 0 to 2
 
 void ChangeDimensionInFile(int dim);
 void PerformDimensionRun(SBR::InstanceLoader& loader, int dim, int argc, char* argv[]);
@@ -16,7 +16,7 @@ int main(int argc, char* argv[])
 	// -1 stands for school
 	int maxRoutes = loader.GetStopPositions().size() - 1;
 
-	float T = 0.1f;
+	float T = 0.5f;
 	int dimension = (int)(minRoutes * (1 - T) + maxRoutes * T);
 	PerformDimensionRun(loader, dimension, argc, argv);
 
@@ -57,6 +57,21 @@ void PerformDimensionRun(SBR::InstanceLoader& loader, int dim, int argc, char* a
 	ChangeDimensionInFile(dim);
 
 	SBR::GreedyInstanceCalculator calc;
+
+	int stopCounts = loader.GetStopPositions().size();
+	if (dim == stopCounts - 1) {
+		std::vector<std::vector<int>> busStopsBySector;
+		for (int i = 1; i < stopCounts; ++i) {
+			busStopsBySector.push_back(std::vector<int>());
+			busStopsBySector[i-1].push_back(i);
+		}
+		calc.CalculateRoutingCost(&loader, busStopsBySector);
+
+		std::string runtimeStrings[] = { "ne", "1m", "5m" };
+		std::string outputFile("output\\res-" + runtimeStrings[SBR_MAX_RUN_TIME] + "-sbr" + std::to_string(SBR_USED_INSTANCE) + ".txt");
+		calc.Print(outputFile.c_str());
+		return;
+	}
 
 	StateP state(new State);
 
